@@ -6,6 +6,8 @@ import AuthGuard from '../components/AuthGuard';
 export const metadata: Metadata = {
   title: 'S-Ledger – Sổ Sách Số',
   description: 'Quản lý thu chi, công nợ và giao dịch đơn giản bằng giọng nói.',
+  // Thêm dòng metadataBase này để Next.js định vị đúng trang web của bạn
+  metadataBase: new URL('https://s-ledger-v2-h6wnigc6t-avengers-63e6.vercel.app'),
   openGraph: {
     title: 'S-Ledger – Sổ Sách Số',
     description: 'Quản lý thu chi, công nợ và giao dịch đơn giản bằng giọng nói.',
@@ -13,7 +15,10 @@ export const metadata: Metadata = {
     siteName: 'S-Ledger',
     images: [
       {
-        url: '/og-image.png', // Tui đổi thành .png ở đây nhé
+        // Ghi thẳng link web + tên hình như thế này cho chắc ăn 100%
+        url: 'https://s-ledger-v2-h6wnigc6t-avengers-63e6.vercel.app/og-image.png',
+        width: 1200,
+        height: 630,
       },
     ],
     locale: 'vi_VN',
