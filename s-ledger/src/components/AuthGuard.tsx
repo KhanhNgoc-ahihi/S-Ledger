@@ -2,39 +2,43 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useStore } from '../app/store/useStore';
-
-const publicPaths = ['/login', '/register'];
+import { Loader2 } from 'lucide-react'; // Thêm icon loading cho đẹp
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
+  const currentUser = useStore((state: any) => state.currentUser);
   const router = useRouter();
   const pathname = usePathname();
-  const currentUser = useStore((state: any) => state.currentUser);
-  const [isClient, setIsClient] = useState(false);
+  
+  // State này để ép hệ thống ĐỢI load xong bộ nhớ trình duyệt mới chạy
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Đảm bảo code chỉ chạy trên client để không lỗi giao diện Next.js
   useEffect(() => {
-    setIsClient(true);
+    setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!isClient) return;
+    if (!isMounted) return; // Nếu chưa load xong bộ nhớ thì khoan làm gì cả
 
-    const isPublicPath = publicPaths.includes(pathname);
+    const isAuthPage = pathname === '/login' || pathname === '/register';
 
-    // Nếu chưa đăng nhập mà vào trang kín -> Đá ra login
-    if (!currentUser && !isPublicPath) {
-      router.push('/login');
+    // Chưa đăng nhập mà rớ vào trang trong -> Đá ra login
+    if (!currentUser && !isAuthPage) {
+      router.replace('/login'); 
     } 
-    // Nếu đã đăng nhập mà vào lại login/register -> Đẩy vô trang chủ
-    else if (currentUser && isPublicPath) {
-      router.push('/');
+    // Đã đăng nhập rồi mà lởn vởn ở trang login/register -> Đẩy vô trong
+    else if (currentUser && isAuthPage) {
+      router.replace('/schedule'); 
     }
-  }, [currentUser, pathname, isClient, router]);
+  }, [currentUser, isMounted, pathname, router]);
 
-  if (!isClient) return null; 
-
-  // Trong lúc đang chờ đá ra login thì không hiện gì cả
-  if (!currentUser && !publicPaths.includes(pathname)) return null;
+  // Trong tích tắc đợi móc dữ liệu từ LocalStorage, hiện loading nhẹ nhàng
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Loader2 className="w-8 h-8 animate-spin text-green-500" />
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }
